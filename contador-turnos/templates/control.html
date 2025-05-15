@@ -3,24 +3,116 @@
 <head>
     <title>Control Mesas</title>
     <style>
-        .button-container {
-            display: flex;
-            gap: 21px;
+        body {
+            margin: 0;
             padding: 20px;
+            background-color: #f0f2f5;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        .desk-button {
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            max-height: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .control-panel {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            font-size: 2em;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .panel-title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .desk-button {
+            padding: 25px 15px;
+            font-size: 1.8em;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .desk-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .desk-button:active {
+            transform: translateY(1px);
+        }
+        
+        .desk-button[data-desk="1"] { background-color: #3498db; }
+        .desk-button[data-desk="2"] { background-color: #2ecc71; }
+        .desk-button[data-desk="3"] { background-color: #e74c3c; }
+        .desk-button[data-desk="4"] { background-color: #f39c12; }
+        
+        .status-info {
+            margin-top: 30px;
+            font-size: 1.2em;
+            color:rgb(86, 105, 105);
         }
     </style>
 </head>
 <body>
-    <div class="button-container">
-        <button class="desk-button" onclick="nextTurn(1)">Mesa 1</button>
-        <button class="desk-button" onclick="nextTurn(2)">Mesa 2</button>
-        <button class="desk-button" onclick="nextTurn(3)">Mesa 3</button>
-        <button class="desk-button" onclick="nextTurn(4)">Mesa 4</button>
+    <div class="header">
+        <img src="static/logo.png" alt="Logo" class="logo">
+        <div class="panel-title">CONTROL DE TURNOS</div>
+    </div>
+    
+    <div class="control-panel">
+        <div class="buttons-grid">
+            <button class="desk-button" data-desk="1" onclick="nextTurn(1)">
+                <div>MESA 1</div>
+                <div class="status-info">Pulse para nuevo turno</div>
+            </button>
+            
+            <button class="desk-button" data-desk="2" onclick="nextTurn(2)">
+                <div>MESA 2</div>
+                <div class="status-info">Pulse para nuevo turno</div>
+            </button>
+            
+            <button class="desk-button" data-desk="3" onclick="nextTurn(3)">
+                <div>MESA 3</div>
+                <div class="status-info">Pulse para nuevo turno</div>
+            </button>
+            
+            <button class="desk-button" data-desk="4" onclick="nextTurn(4)">
+                <div>MESA 4</div>
+                <div class="status-info">Pulse para nuevo turno</div>
+            </button>
+        </div>
+        
+        <div class="status-info" id="lastAction">
+            Última acción: Esperando operación...
+        </div>
     </div>
 
     <script>
@@ -31,6 +123,23 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({desk: desk})
+            })
+            .then(response => {
+                if(response.ok) {
+                    document.getElementById('lastAction').textContent = 
+                        `Turno generado en Mesa ${desk} - ${new Date().toLocaleTimeString()}`;
+                    
+                    // Efecto visual de confirmación
+                    const button = document.querySelector(`[data-desk="${desk}"]`);
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = '';
+                    }, 200);
+                }
+            })
+            .catch(error => {
+                document.getElementById('lastAction').textContent = 
+                    `Error al generar turno: ${error.message}`;
             });
         }
     </script>
